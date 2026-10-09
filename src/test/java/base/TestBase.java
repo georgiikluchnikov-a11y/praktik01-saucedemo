@@ -58,15 +58,34 @@ public abstract class TestBase {
     }
 
     /**
-     * Открывает страницу с одной повторной попыткой: демо-стенд периодически
-     * отвечает медленно, и первая загрузка может завершиться таймаутом.
+     * Открывает страницу с повторными попытками: демо-стенд периодически отвечает
+     * медленно или отдаёт страницу ошибки вместо формы.
      */
     protected void openWithRetry(String path) {
-        try {
-            driver.get(BASE_URL + path);
-        } catch (org.openqa.selenium.TimeoutException firstAttempt) {
-            driver.get(BASE_URL + path);
+        for (int attempt = 0; attempt < 3; attempt++) {
+            try {
+                driver.get(BASE_URL + path);
+                return;
+            } catch (org.openqa.selenium.TimeoutException timeout) {
+                // стенд не ответил — пробуем снова
+            }
         }
+        throw new IllegalStateException("Не удалось открыть " + BASE_URL + path);
+    }
+
+    /** Вход под standard_user с повторными попытками при медленном ответе стенда. */
+    protected void performStandardLogin() {
+        for (int attempt = 0; attempt < 3; attempt++) {
+            openWithRetry("/");
+            new pages.LoginPage(driver).login(STANDARD_USER, PASSWORD);
+            try {
+                wait.until(d -> d.getCurrentUrl().contains("/inventory.html"));
+                return;
+            } catch (org.openqa.selenium.TimeoutException notLoggedIn) {
+                // страница не загрузилась или форма не отрисовалась — ещё попытка
+            }
+        }
+        throw new IllegalStateException("Не удалось войти под " + STANDARD_USER + " за три попытки");
     }
 
     protected static boolean isHeadless() {

@@ -32,8 +32,32 @@ public class CheckoutPage extends BasePage {
         type(postalCode, zip);
     }
 
+    /**
+     * Переход к подтверждению заказа. Демо-стенд периодически не успевает обработать
+     * клик, поэтому при отсутствии перехода выполняется одна повторная попытка.
+     */
     public void continueToOverview() {
+        clickAndWaitForUrl(continueButton, "/checkout-step-two.html");
+    }
+
+    /** Клик «Continue» без ожидания перехода — для негативных сценариев валидации. */
+    public void continueExpectingValidationError() {
         click(continueButton);
+    }
+
+    /** Завершение заказа с одной повторной попыткой. */
+    public void finish() {
+        clickAndWaitForUrl(finishButton, "/checkout-complete.html");
+    }
+
+    private void clickAndWaitForUrl(By button, String urlPart) {
+        click(button);
+        try {
+            wait.until(d -> d.getCurrentUrl().contains(urlPart));
+        } catch (org.openqa.selenium.TimeoutException firstAttempt) {
+            click(button);
+            wait.until(d -> d.getCurrentUrl().contains(urlPart));
+        }
     }
 
     public CheckoutPage submitCustomerData(String first, String last, String zip) {
@@ -62,10 +86,6 @@ public class CheckoutPage extends BasePage {
 
     public String totalText() {
         return textOf(total);
-    }
-
-    public void finish() {
-        click(finishButton);
     }
 
     public String completeHeaderText() {

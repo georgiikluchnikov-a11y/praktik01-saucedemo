@@ -6,7 +6,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.CheckoutPage;
 import pages.InventoryPage;
-import pages.LoginPage;
 
 public class CheckoutTest extends TestBase {
 
@@ -14,9 +13,7 @@ public class CheckoutTest extends TestBase {
 
     @BeforeMethod(alwaysRun = true)
     public void loginAsStandardUser() {
-        openWithRetry("/");
-        new LoginPage(driver).login(STANDARD_USER, PASSWORD);
-        wait.until(d -> d.getCurrentUrl().contains("/inventory.html"));
+        performStandardLogin();
         inventoryPage = new InventoryPage(driver);
     }
 
@@ -29,7 +26,6 @@ public class CheckoutTest extends TestBase {
         wait.until(d -> d.getCurrentUrl().contains("/checkout-step-one.html"));
 
         checkoutPage.submitCustomerData("Ivan", "Petrov", "123456");
-        wait.until(d -> d.getCurrentUrl().contains("/checkout-step-two.html"));
 
         Assert.assertEquals(checkoutPage.overviewItemCount(), 1,
                 "На шаге подтверждения ожидался один товар");
@@ -39,7 +35,6 @@ public class CheckoutTest extends TestBase {
                 "Ожидалась итоговая сумма, фактически: " + checkoutPage.totalText());
 
         checkoutPage.finish();
-        wait.until(d -> d.getCurrentUrl().contains("/checkout-complete.html"));
 
         Assert.assertEquals(checkoutPage.completeHeaderText(), "Thank you for your order!",
                 "Ожидалось подтверждение оформления заказа");
@@ -53,7 +48,7 @@ public class CheckoutTest extends TestBase {
         CheckoutPage checkoutPage = new pages.CartPage(driver).checkout();
         wait.until(d -> d.getCurrentUrl().contains("/checkout-step-one.html"));
 
-        checkoutPage.continueToOverview();
+        checkoutPage.continueExpectingValidationError();
 
         Assert.assertEquals(checkoutPage.errorText(), "Error: First Name is required",
                 "Ожидалась ошибка об обязательном поле First Name");
@@ -70,7 +65,7 @@ public class CheckoutTest extends TestBase {
         wait.until(d -> d.getCurrentUrl().contains("/checkout-step-one.html"));
 
         checkoutPage.fillCustomerData("Ivan", "Petrov", "");
-        checkoutPage.continueToOverview();
+        checkoutPage.continueExpectingValidationError();
 
         Assert.assertEquals(checkoutPage.errorText(), "Error: Postal Code is required",
                 "Ожидалась ошибка об обязательном поле Postal Code");

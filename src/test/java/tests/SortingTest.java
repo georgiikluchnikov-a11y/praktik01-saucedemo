@@ -5,7 +5,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.InventoryPage;
-import pages.LoginPage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +15,7 @@ public class SortingTest extends TestBase {
 
     @BeforeMethod(alwaysRun = true)
     public void loginAsStandardUser() {
-        openWithRetry("/");
-        new LoginPage(driver).login(STANDARD_USER, PASSWORD);
-        wait.until(d -> d.getCurrentUrl().contains("/inventory.html"));
+        performStandardLogin();
         inventoryPage = new InventoryPage(driver);
     }
 
