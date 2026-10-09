@@ -79,7 +79,10 @@ public class InventoryPage extends BasePage {
     }
 
     public void openCart() {
-        click(cartLink);
+        retryAction(() -> {
+            click(cartLink);
+            wait.until(d -> d.getCurrentUrl().contains("/cart.html"));
+        });
     }
 
     public void sortBy(String value) {

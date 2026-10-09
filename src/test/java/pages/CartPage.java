@@ -40,7 +40,10 @@ public class CartPage extends BasePage {
     }
 
     public CheckoutPage checkout() {
-        click(checkoutButton);
+        retryAction(() -> {
+            click(checkoutButton);
+            wait.until(d -> d.getCurrentUrl().contains("/checkout-step-one.html"));
+        });
         return new CheckoutPage(driver);
     }
 

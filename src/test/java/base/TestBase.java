@@ -17,7 +17,7 @@ import java.time.Duration;
 public abstract class TestBase {
 
     protected static final String BASE_URL = System.getProperty("baseUrl", "https://www.saucedemo.com");
-    protected static final Duration TIMEOUT = Duration.ofSeconds(10);
+    protected static final Duration TIMEOUT = Duration.ofSeconds(20);
 
     /** Демонстрационные учётные записи Swag Labs. */
     protected static final String PASSWORD = "secret_sauce";

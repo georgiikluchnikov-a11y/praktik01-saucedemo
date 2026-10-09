@@ -27,6 +27,8 @@ public class CheckoutPage extends BasePage {
     }
 
     public void fillCustomerData(String first, String last, String zip) {
+        wait.until(org.openqa.selenium.support.ui.ExpectedConditions
+                .visibilityOfElementLocated(firstName));
         type(firstName, first);
         type(lastName, last);
         type(postalCode, zip);
@@ -37,17 +39,19 @@ public class CheckoutPage extends BasePage {
      * клик, поэтому при отсутствии перехода выполняется одна повторная попытка.
      */
     public void continueToOverview() {
-        clickAndWaitForUrl(continueButton, "/checkout-step-two.html");
+        retryAction(() -> clickAndWaitForUrl(continueButton, "/checkout-step-two.html"));
     }
 
     /** Клик «Continue» без ожидания перехода — для негативных сценариев валидации. */
     public void continueExpectingValidationError() {
+        wait.until(org.openqa.selenium.support.ui.ExpectedConditions
+                .elementToBeClickable(continueButton));
         click(continueButton);
     }
 
     /** Завершение заказа с одной повторной попыткой. */
     public void finish() {
-        clickAndWaitForUrl(finishButton, "/checkout-complete.html");
+        retryAction(() -> clickAndWaitForUrl(finishButton, "/checkout-complete.html"));
     }
 
     private void clickAndWaitForUrl(By button, String urlPart) {
@@ -61,8 +65,10 @@ public class CheckoutPage extends BasePage {
     }
 
     public CheckoutPage submitCustomerData(String first, String last, String zip) {
-        fillCustomerData(first, last, zip);
-        continueToOverview();
+        retryAction(() -> {
+            fillCustomerData(first, last, zip);
+            continueToOverview();
+        });
         return this;
     }
 

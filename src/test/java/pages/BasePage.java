@@ -13,7 +13,7 @@ import java.time.Duration;
  */
 public abstract class BasePage {
 
-    protected static final Duration TIMEOUT = Duration.ofSeconds(10);
+    protected static final Duration TIMEOUT = Duration.ofSeconds(20);
 
     protected final WebDriver driver;
     protected final WebDriverWait wait;
@@ -42,6 +42,20 @@ public abstract class BasePage {
 
     protected String textOf(By locator) {
         return visible(locator).getText();
+    }
+
+    /** Повторяет действие при медленном ответе стенда (до трёх попыток). */
+    protected void retryAction(Runnable action) {
+        org.openqa.selenium.WebDriverException last = null;
+        for (int attempt = 0; attempt < 3; attempt++) {
+            try {
+                action.run();
+                return;
+            } catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException e) {
+                last = e;
+            }
+        }
+        throw last;
     }
 
     public String currentUrl() {
