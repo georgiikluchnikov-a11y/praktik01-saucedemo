@@ -33,6 +33,15 @@ public abstract class BasePage {
         wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
 
+    /** Ждёт, пока счётчик корзины станет равным ожидаемому значению. */
+    protected void waitCartBadge(int expected) {
+        wait.until(d -> {
+            java.util.List<org.openqa.selenium.WebElement> badges =
+                    d.findElements(org.openqa.selenium.By.className("shopping_cart_badge"));
+            return badges.isEmpty() ? expected == 0 : Integer.parseInt(badges.get(0).getText()) == expected;
+        });
+    }
+
     /** Очищает поле и вводит значение. */
     protected void type(By locator, String text) {
         WebElement element = visible(locator);
