@@ -3,6 +3,7 @@
 <suite name="SauceDemo UI Tests" verbose="1">
     <listeners>
         <listener class-name="utils.RetryAnnotationTransformer"/>
+        <listener class-name="utils.ScreenshotOnFailureListener"/>
     </listeners>
     <test name="All UI tests">
         <classes>
